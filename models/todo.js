@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         where: {id: this.id}
       });
     }
+
+    static getTodos() {
+      return Todo.findAll();
+    }
   }
   Todo.init(
     {
