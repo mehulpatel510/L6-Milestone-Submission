@@ -30,14 +30,11 @@
                     </tr>
                     <% } %>
             </table>
-        <% } 
-        else
-        {
-            %>
-            Record Not found!
-            <%
-        }%>
+            <% } else { %>
+                Record Not found!
+                <% } %>
 
+    <%- include('footer.ejs') %>
 </body>
 
 </html>
