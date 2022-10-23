@@ -6,20 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/css/styles.css" rel="stylesheet">
-    <title>Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>To-Do Manager</title>
 </head>
 
 <body>
-    <%- include('header.ejs') %>
-        <% if ( allTodos !=null ) { 
-            %>
-            <%- include('todos.ejs') %>
-            
-            <% } else { %>
-                Record Not found!
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+                <form>
+                    <div class="flex gap-2 py-4">
+                        <div class="flex-auto">
+                            <input type="text" class="border border-gray-600 rounded text-gray-900 w-full p-2 text-sm"
+                                required placeholder="What's next?" required>
+                        </div>
+                        <div class="flex-auto">
+                            <input type="date"
+                                class="border border-gray-600 rounded text-gray-900 w-full p-2 text-sm leading-4">
+                        </div>
+                        <div class="flex-none">
+                            <button type="submit"
+                                class="bg-green-600 text-white rounded px-5 py-2 font-medium mr-2 mb-2">Add</button>
+                        </div>
+                    </div>
+                </form>
+                <% if ( overdueTodos !=null ) { %>
+                    <%- include('todos.ejs') %>
                 <% } %>
+                
+        </div>
+    </div>
 
-    <%- include('footer.ejs') %>
 </body>
 
 </html>

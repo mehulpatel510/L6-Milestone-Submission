@@ -1,5 +1,7 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
+// const { toDefaultValue } = require("sequelize/types/utils");
+
 module.exports = (sequelize, DataTypes) => {
   class Todo extends Model {
     /**
@@ -26,6 +28,65 @@ module.exports = (sequelize, DataTypes) => {
 
     static getTodos() {
       return Todo.findAll();
+    }
+
+    static getOverdueTodos(){
+      const overdueTodos = Todo.findAll({
+        where: {
+          dueDate: {
+            [Op.lt]: new Date()
+          }
+        }
+      });
+      console.log("Overdue: " + overdueTodos);
+      return overdueTodos;
+    }
+
+    static getDueTodayTodos(){
+      const dueTodayTodos = Todo.findAll({
+        where: {
+          dueDate: new Date()
+        }
+      });
+      return dueTodayTodos;
+    }
+
+    static getDueLaterTodos()
+    {
+      const dueLaterTodos = Todo.findAll({
+        where: {
+          dueDate: {
+            [Op.gt]: new Date()
+          }
+        }
+      });
+      return dueLaterTodos;
+    }
+    isOverdue()
+    {
+      if(this.id.dueDate < new Date())
+        return true;
+      else 
+        return false;
+    }
+    isDueToday()
+    {
+      if(this.id.dueDate == new Date())
+        return true;
+      else 
+        return false;
+    }
+    isDueLater()
+    {
+      if(this.id.dueDate > new Date())
+        return true;
+      else 
+        return false;
+    }
+
+    displayableString() {
+      let dateString = this.dueDate == new Date().toLocaleDateString("en-CA") ? "" : this.dueDate;        
+      return `${this.title} ${ dateString}`.trim();
     }
   }
   Todo.init(

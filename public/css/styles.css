@@ -1,5 +1,5 @@
 body{
-    color: red;
+    color: black;
     font-family:'Courier New', Courier, monospace;
 
 }
@@ -7,4 +7,7 @@ table, td{
     border: 1px solid black;
     padding: 5px;
     margin: 0px;
+}
+.Todo-Item:hover .trash-icon{
+    display: block;
 }
