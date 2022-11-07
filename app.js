@@ -2,14 +2,19 @@ const express = require("express");
 const app = express();
 const { Todo } = require("./models");
 const bodyParser = require("body-parser");
-const path = require("path")
+
+//const path = require("path")
+//app.use(express.static(path.join(__dirname,"public")));
+
 
 app.use(bodyParser.json());
+app.use(express.urlencoded({extended: false }));
+
 
 app.set("view engine","ejs");
 
 app.get("/", async function (request, response) {
-  // const allTodos = await Todo.getTodos();
+  const allTodos = await Todo.getTodos();
   const overdueTodos = await Todo.getOverdueTodos();
   const dueTodayTodos = await Todo.getDueTodayTodos();
   const dueLaterTodos = await Todo.getDueLaterTodos();
@@ -24,7 +29,6 @@ app.get("/", async function (request, response) {
   }
 });
 
-app.use(express.static(path.join(__dirname,"public")));
 
 app.get("/todos", async function (request, response) {
   console.log("Processing list of all Todos ...");
@@ -50,9 +54,12 @@ app.get("/todos/:id", async function (request, response) {
 });
 
 app.post("/todos", async function (request, response) {
+  // Create a todo
   try {
-    const todo = await Todo.addTodo(request.body);
-    return response.json(todo);
+    //const todo = 
+    await Todo.addTodo(request.body);
+    //return response.json(todo);
+    return response.redirect("/");
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
@@ -81,7 +88,8 @@ app.delete("/todos/:id", async function (request, response) {
     if (todo == null)
       return response.send(false);
     // Then, we have to respond back with true/false based on whether the Todo was deleted or not.
-    const result = todo.deleteTodo();
+    // const result = 
+    todo.deleteTodo();
     return response.send(true);
   } catch (error) {
     console.log(error);
