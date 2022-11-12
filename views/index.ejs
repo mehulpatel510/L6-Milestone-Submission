@@ -5,8 +5,50 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <link href="/css/styles.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
+
+        function updateTodo(id,status) {
+            console.log("Status ::: " + status);
+            // fetch(`/todos/${id}/markAsCompleted`, {
+                fetch(`/todos/${id}`, {
+                method: "put",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token,
+                    completed: status
+                })
+            })
+                .then((res) => {
+                    window.location.reload();
+                })
+                .catch((err) => console.error(err));
+        }
+
+        function removeTodo(id) {
+            fetch(`/todos/${id}`, {
+                method: "delete",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "_csrf": token
+                })
+            })
+                .then((res) => {
+                    window.location.reload();
+                })
+                .catch((err) => console.error(err));
+        }
+
+    </script>
+
+
+
     <title>To-Do Manager</title>
 </head>
 
@@ -15,10 +57,12 @@
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
                 <form action="/todos" method="post">
+                    <input type="hidden" name="_csrf" value="<%- csrfToken %>" />
                     <div class="flex gap-2 py-4">
                         <div class="flex-auto">
-                            <input type="text" name="title" class="border border-gray-600 rounded text-gray-900 w-full p-2 text-sm"
-                                required placeholder="What's next?" required>
+                            <input type="text" name="title"
+                                class="border border-gray-600 rounded text-gray-900 w-full p-2 text-sm" required
+                                placeholder="What's next?" required>
                         </div>
                         <div class="flex-auto">
                             <input type="date" name="dueDate"
@@ -30,8 +74,8 @@
                         </div>
                     </div>
                 </form>
-            <%- include('todos.ejs') %>
-                
+                <%- include('todos.ejs') %>
+
         </div>
     </div>
 

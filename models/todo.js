@@ -20,9 +20,15 @@ module.exports = (sequelize, DataTypes) => {
     markAsCompleted() {
       return this.update({ completed: true });
     }
+
+    setCompletionStatus(status){
+      return this.update({ completed: status });
+    }
+    
     deleteTodo() {
       return Todo.destroy({
-        where: {id: this.id}
+        where: {
+          id: this.id}
       });
     }
 
@@ -62,6 +68,17 @@ module.exports = (sequelize, DataTypes) => {
       });
       return dueLaterTodos;
     }
+
+    static getCompletedItems()
+    {
+      const completedItems = Todo.findAll({
+        where: {
+          completed: true,
+        }
+      });
+      return completedItems;
+    }
+
     isOverdue()
     {
       if(this.id.dueDate < new Date())
