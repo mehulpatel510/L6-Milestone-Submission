@@ -41,7 +41,8 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           dueDate: {
             [Op.lt]: new Date()
-          }
+          },
+          completed:false
         }
       });
       console.log("Overdue: " + overdueTodos);
@@ -52,7 +53,8 @@ module.exports = (sequelize, DataTypes) => {
       const dueTodayTodos = Todo.findAll({
         where: {
           dueDate: new Date()
-        }
+        },
+        completed:false
       });
       return dueTodayTodos;
     }
@@ -63,7 +65,8 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           dueDate: {
             [Op.gt]: new Date()
-          }
+          },
+          completed:false
         }
       });
       return dueLaterTodos;
