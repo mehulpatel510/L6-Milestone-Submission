@@ -52,9 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     static getDueTodayTodos(){
       const dueTodayTodos = Todo.findAll({
         where: {
-          dueDate: new Date()
+          dueDate: new Date(),
+          completed:false
         },
-        completed:false
+        
       });
       return dueTodayTodos;
     }
