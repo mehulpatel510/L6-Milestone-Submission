@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const request = require("supertest");
-const csrf = require("tiny-csrf")
+//const csrf = require("tiny-csrf")
 const db = require("../models/index");
 const app = require("../app");
 const cheerio = require("cheerio");
@@ -28,11 +28,51 @@ describe("Todo Application", function () {
     }
   });
 
+  let login = async(agent, username,password) => {
+    let res = await agent.get("/login");
+    const csrfToken = extractCsrfToken(res);
+    res = await agent.post("/session").send({
+      email: username,
+      password: password,
+      _csrf: csrfToken
+    });
+
+    
+  }
+
+  test("Sign up", async () => {
+    let res = await agent.get("/signup");
+    const csrfToken = extractCsrfToken(res);
+    console.log("CSRF Token - Sign up:" + csrfToken);
+    res = await agent.post("/users").send({
+      firstName: "Test",
+      lastName: "User A",
+      email:"user.a@test.com",
+      password: "123456",
+      _csrf: csrfToken
+    })
+    expect(res.statusCode).toBe(302);
+  })
+
+  test("Sign Out", async () => {
+    let res = await agent.get("/todos");
+    const csrfToken = extractCsrfToken(res);
+    console.log("CSRF Token - Sign out:" + csrfToken);
+    res = await agent.get("/signout").send({
+      _csrf: csrfToken
+    })
+    expect(res.statusCode).toBe(302);
+  })
+
 
 
   test("Creates a todo and responds with json at /todos POST endpoint", async () => {
+    const agent = request.agent(server);
+    await login(agent,"user.a@test.com","123456");
+
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
+    console.log("CSRF Token0:" + csrfToken);
     const response = await agent.post("/todos").send({
       title: "Buy milk",
       dueDate: new Date().toISOString(),
@@ -44,6 +84,8 @@ describe("Todo Application", function () {
   });
 
   test("Marks a todo with the given ID as complete", async () => {
+    const agent = request.agent(server);
+    await login(agent,"user.a@test.com","123456");
 
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
@@ -105,7 +147,8 @@ describe("Todo Application", function () {
   // });
 
   test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
-    // FILL IN YOUR CODE HERE
+    const agent = request.agent(server);
+    await login(agent,"user.a@test.com","123456");
    
     let res = await agent.get("/");
     let csrfToken = extractCsrfToken(res);
