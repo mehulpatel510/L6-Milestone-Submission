@@ -44,24 +44,32 @@ passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
 }, (username, password, done) => {
-  console.log("Authentication")
+  console.log("Authentication for " + username)
   User.findOne({ where: { email: username } })
     .then(async (user) => {
-      console.log("Check password for " + user.username)
-      const result = await bcrypt.compare(password, user.password);
-      console.log(result)
-      if (result) {
-        return done(null, user);
+      if (user) {
+        console.log("Check password for " + user)
+        const result = await bcrypt.compare(password, user.password);
+        console.log(result)
+        if (result) {
+          console.log("Login Result:" + result)
+          return done(null, user);
+        }
+        else {
+          console.log("Invalid user");
+          return done(null, false, { message: "Invalid Username/Password" });
+        }
       }
       else {
         console.log("Invalid user");
         return done(null, false, { message: "Invalid Username/Password" });
       }
-
     })
     .catch((error) => {
+      console.log("Fail email id: " + error)
       return (error)
     })
+  console.log("Complete Authentication");
 }
 ))
 
@@ -146,7 +154,7 @@ app.post("/users", async (request, response) => {
           console.log(e.message);
           request.flash('error', { message: e.message });
         });
-        
+
         response.redirect("/signup");
         //throw err;
       });
