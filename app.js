@@ -15,6 +15,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const path = require("path");
+// eslint-disable-next-line no-unused-vars
+const user = require("./models/user");
 //const __dirname = path.resolve();
 // eslint-disable-next-line no-undef
 app.set("views", path.join(__dirname, "views"));
@@ -50,9 +52,9 @@ passport.use(new LocalStrategy({
       if (user) {
         console.log("Check password for " + user)
         const result = await bcrypt.compare(password, user.password);
-        console.log(result)
+        console.log("Login Result:" + result)
         if (result) {
-          console.log("Login Result:" + result)
+
           return done(null, user);
         }
         else {
@@ -74,7 +76,7 @@ passport.use(new LocalStrategy({
 ))
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing user in session", user.id);
+  console.log("Serializing user in session", user.email);
   done(null, user.id);
 });
 
@@ -115,6 +117,8 @@ app.post("/session",
     failureFlash: true,
   }),
   (request, response) => {
+    console.log("Username: " + request.user.email)
+
     response.redirect("/")
   });
 
@@ -139,13 +143,17 @@ app.post("/users", async (request, response) => {
       password: hashedPassword
     })
       .then(user => {
+        console.log("Check for Login")
         request.login(user, (err) => {
           if (err) {
             console.log("Login Issue:" + err);
-          }
+            response.redirect("/login");
+          }else{
+          console.log("Forward to default page:" + user);
+          response.redirect("/");
+        }
         });
-        console.log(user);
-        response.redirect("/");
+
       })
       .catch(err => {
         console.log("Error at Sign up:" + err);
@@ -181,7 +189,7 @@ app.get("/", connectEnsureLogin.ensureLoggedIn(), async function (request, respo
   const dueTodayTodos = await Todo.getDueTodayTodos(loggedUserId);
   const dueLaterTodos = await Todo.getDueLaterTodos(loggedUserId);
   const completedItems = await Todo.getCompletedItems(loggedUserId);
-
+  console.log("Username:: " + request.user.email)
   if (request.accepts("html")) {
     response.render("index", {
       title: "Todos List",
@@ -190,6 +198,7 @@ app.get("/", connectEnsureLogin.ensureLoggedIn(), async function (request, respo
       dueLaterTodos,
       completedItems,
       csrfToken: request.csrfToken(),
+      username: request.user.firstName + " " + request.user.lastName
     });
   }
   else {
@@ -250,17 +259,19 @@ app.post("/todos", connectEnsureLogin.ensureLoggedIn(), async function (request,
 
 // app.put("/todos/:id/markAsCompleted", async function (request, response) {
 app.put("/todos/:id", connectEnsureLogin.ensureLoggedIn(), async function (request, response) {
-  console.log("Testing:::::::::" + request.params.id + " --- " + request.body.completed);
+  //console.log("Testing:::::::::" + request.params.id + " --- " + request.body.completed);
   const todo = await Todo.findByPk(request.params.id);
   console.log("Todo:-" + todo.displayableString());
   try {
     //const updatedTodo = await todo.markAsCompleted();
     if (todo.userId == request.user.id) {
       const updatedTodo = await todo.setCompletionStatus(request.body.completed);
+      //console.log("update response: " + JSON.parse(updatedTodo))
       return response.json(updatedTodo);
     }
     else {
-      return {};
+      console.log("update fail for : " + todo)
+      return response.json(todo);
     }
   } catch (error) {
     console.log("PUT Request:" + error);

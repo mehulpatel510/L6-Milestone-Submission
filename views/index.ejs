@@ -57,6 +57,8 @@
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
             <a href="/signout">Sign-Out</a>
+            <br/>    
+            Welcome, <%= username %>
             <div class="text-red-600 mt-4">
 
             <% if(messages && messages.error && messages.error.length > 0)  { %>
